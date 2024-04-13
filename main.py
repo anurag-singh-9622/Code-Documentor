@@ -5,7 +5,7 @@ import random, json
 client = OpenAI(api_key = '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')
 # with open('doc.json') as file:
 #     # Step 2: Parse the JSON data
-#     data = json.load(file)
+#     data = json.load(file) something
 if 'text' not in st.session_state:
     st.session_state.text = False
 
