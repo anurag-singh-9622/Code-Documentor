@@ -2,7 +2,9 @@ from openai import OpenAI
 import streamlit as st
 import random, json
 
-client = OpenAI(api_key = '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')
+api_key = st.text_input(':RED[ENTER YOUR API KEY]',placeholder='Insert your api key here')
+
+client = OpenAI(api_key = api_key)
 # with open('doc.json') as file:
 #     # Step 2: Parse the JSON data
 #     data = json.load(file) something
@@ -59,10 +61,16 @@ def llm(promt):
         "content": "You are a code documentation assistant//\n which helps creating the document for the code for developers.// \n//You will create the document in Markdown format."
         },
         {
+            "role": "user",
+            "content":"""If code is not proper then return sentence.
+            Sentence: 'Please provide the code.'"""
+        },
+        {
         "role": "user",
         "content": f"""Elaborate all the function, loops, if/else, variables or anything else that might be important and what is its use which you are using in the code.
          code: ```{prompt}```"""
         }
+
     ],
 
     temperature=0.8,
