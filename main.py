@@ -64,7 +64,7 @@ def llm(promt):
         {
         "role": "system",
         "content": """You are a code documentation assistant//\n which helps creating the document for the code for developers.// \n//You will create the document in Markdown format.
-        You will provide any suggestion related to improve code,// You will provide inline comment of the code//"""
+        You will provide any suggestion related to improve code//"""
         },
         {
         "role": "user",
@@ -75,7 +75,7 @@ def llm(promt):
     ],
 
     temperature=0.8,
-    max_tokens=2000,
+    max_tokens=1000,
     top_p=1,
     frequency_penalty=0,
     presence_penalty=0
