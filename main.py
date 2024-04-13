@@ -7,7 +7,7 @@ import os
 # api_key = st.text_input(':RED[ENTER YOUR API KEY]',placeholder='Insert your api key here')
 # load_dotenv()
 # api_key = os.getenv('OPENAI_API_KEY')
-api_key = os.environ['OPENAI_API_KEY']
+api_key = os.environ['OPENAI_API_KEY_MINE']
 
 client = OpenAI(api_key = api_key)
 # with open('doc.json') as file:
@@ -51,52 +51,48 @@ if st.session_state.selected:
 
 ###########################################################################################
 
+    prompt = st.text_area(label="Code input",placeholder="Write your code here",height=305, on_change=text_input)
+
+    def llm(promt):
+        response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+            "role": "system",
+            "content": """You are a code documentation assistant//\n which helps creating the document for the code for developers.// \n//You will create the document in Markdown format.
+            You will provide any suggestion related to improve code//"""
+            },
+            {
+            "role": "user",
+            "content": f"""Elaborate all the functions, loops, if/else, variables or anything else that might be important and what is its use which you are using in the code.
+            code: ```{prompt}```"""
+            }
+
+        ],
+
+        temperature=0.8,
+        max_tokens=1000,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+        )
+    
+        return response
 
 
+    if st.session_state.text and len(prompt) > 1:
+        st.button('Submit', on_click=click_button)
+        if st.session_state.clicked:
+            response = llm(prompt)
 
-
-prompt = st.text_area(label="Code input",placeholder="Write your code here",height=305, on_change=text_input)
-
-def llm(promt):
-    response = client.chat.completions.create(
-    model="gpt-3.5-turbo",
-    messages=[
-        {
-        "role": "system",
-        "content": """You are a code documentation assistant//\n which helps creating the document for the code for developers.// \n//You will create the document in Markdown format.
-        You will provide any suggestion related to improve code//"""
-        },
-        {
-        "role": "user",
-        "content": f"""Elaborate all the functions, loops, if/else, variables or anything else that might be important and what is its use which you are using in the code.
-         code: ```{prompt}```"""
-        }
-
-    ],
-
-    temperature=0.8,
-    max_tokens=1000,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0
-    )
- 
-    return response
-
-
-if st.session_state.text and len(prompt) > 1:
-    st.button('Submit', on_click=click_button)
-    if st.session_state.clicked:
-        response = llm(prompt)
-
-        with st.sidebar:
-            f"Total tokens:   {response.usage.total_tokens}"
-        result = response.choices[0].message.content
-        st.success(f'Ye le {selected_option} {random.choice (galis)}')
-        result
-        print(result)
-elif st.session_state.text:
-    if selected_option is not None: #you can remove this line if not needed
-        st.warning('Pura code likh '+ f":red[{selected_option} {random.choice (galis)}]")
+            with st.sidebar:
+                f"Total tokens:   {response.usage.total_tokens}"
+            result = response.choices[0].message.content
+            st.success(f'Ye le {selected_option} {random.choice (galis)}')
+            result
+            print(result)
+    elif st.session_state.text:
+        if selected_option is not None: #you can remove this line if not needed
+            st.warning('Pura code likh '+ f":red[{selected_option} {random.choice (galis)}]")
 
 
