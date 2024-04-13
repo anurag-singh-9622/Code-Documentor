@@ -63,16 +63,12 @@ def llm(promt):
     messages=[
         {
         "role": "system",
-        "content": "You are a code documentation assistant//\n which helps creating the document for the code for developers.// \n//You will create the document in Markdown format."
-        },
-        {
-            "role": "user",
-            "content":"""If code is not proper then return sentence.
-            Sentence: 'Please provide the code.'"""
+        "content": """You are a code documentation assistant//\n which helps creating the document for the code for developers.// \n//You will create the document in Markdown format.
+        You will provide any suggestion related to improve code,// also provide inline comment in the code//"""
         },
         {
         "role": "user",
-        "content": f"""Elaborate all the function, loops, if/else, variables or anything else that might be important and what is its use which you are using in the code.
+        "content": f"""Elaborate all the functions, loops, if/else, variables or anything else that might be important and what is its use which you are using in the code.
          code: ```{prompt}```"""
         }
 
