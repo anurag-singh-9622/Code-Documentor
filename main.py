@@ -41,7 +41,7 @@ weights = [3,2,2,1,1,1,6,3]
 # Normalize weights to probabilities
 probabilities = np.array(weights) / np.sum(weights)
 
-galis = ['bhenchod', 'bosdiwale', 'madharchod', 'gandu', 'ben ka lode', 'chutiye', 'jiska muh lode jaisa', 'Riya ki gaand']
+galis = ['bhenchod', 'bosdiwale', 'madharchod', 'gandu', 'ben ka lode', 'chutiye', 'jiska muh lode jaisa']
 
 # Define a format function
 def format_func(option):
@@ -53,7 +53,7 @@ if not st.session_state.clicked:
     st.session_state.random_element = np.random.choice(names, p=probabilities)
 
 # Create the select box with custom formatting
-selected_option = st.selectbox('Choose an option:', options, format_func=format_func, index=None, placeholder = "Choose an option", on_change=selected)
+selected_option = st.selectbox('Choose an option:', options, format_func=format_func, index=None, placeholder = "Choose an option", on_change=selected,label_visibility = "collapsed")
 if selected_option == "Don't go":
     with st.spinner("Wait for it..."):
         time.sleep(3)
@@ -66,7 +66,7 @@ if st.session_state.selected:
 
 ###########################################################################################
     time.sleep(1)
-    prompt = st.text_area(label="Code input",placeholder="Write your code here",height=305, on_change=text_input)
+    prompt = st.text_area(label="Code input, :red[press Ctrl+Enter after writing code]",placeholder="Write your code here",height=305, on_change=text_input)
 
     def llm(promt):
         response = client.chat.completions.create(
