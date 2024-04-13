@@ -2,6 +2,8 @@ from openai import OpenAI
 import streamlit as st
 import random, json
 import os
+import numpy as np
+import time
 # from dotenv import load_dotenv
 
 # api_key = st.text_input(':RED[ENTER YOUR API KEY]',placeholder='Insert your api key here')
@@ -32,8 +34,14 @@ def selected():
     st.session_state.selected = True
 ###########################################################################################
 #Adding gali sentences
-names = ['Vaibhav', 'Deepu', 'Shantanu', 'Ankit', 'Rahul', 'Apoorv', 'Riya']
-galis = ['bhenchod', 'bosdiwale', 'madharchod', 'gandu', 'ben ka loda', 'chutia', 'jiska muh lode jaisa']
+options = ['Go', "Don't go"]
+names = ['Vaibhav', 'Deepu', 'Shantanu', 'Ankit', 'Rahul', 'Apoorv', 'Riya','Rajeev']
+# Define weights for each element (higher weight means higher probability)
+weights = [3,2,2,1,1,1,6,3]
+# Normalize weights to probabilities
+probabilities = np.array(weights) / np.sum(weights)
+
+galis = ['bhenchod', 'bosdiwale', 'madharchod', 'gandu', 'ben ka lode', 'chutiye', 'jiska muh lode jaisa', 'Riya ki gaand']
 
 # Define a format function
 def format_func(option):
@@ -41,16 +49,23 @@ def format_func(option):
  
 if not st.session_state.clicked:
     st.session_state.gali = random.choice (galis)
+    # Randomly sample from the list with biased probabilities
+    st.session_state.random_element = np.random.choice(names, p=probabilities)
 
 # Create the select box with custom formatting
-selected_option = st.selectbox('Choose an option:', names, format_func=format_func, index=None, placeholder = "Choose an option", on_change=selected)
+selected_option = st.selectbox('Choose an option:', options, format_func=format_func, index=None, placeholder = "Choose an option", on_change=selected)
+if selected_option == "Don't go":
+    with st.spinner("Wait for it..."):
+        time.sleep(3)
+        st.info("chal benchod, mai to jaunga",icon = "ℹ️")
 
 if st.session_state.selected:
     # Display the selected option
-    st.write('Chal code likh', f":red[{selected_option} {st.session_state.gali}]")
+    time.sleep(3)
+    st.info('Chal code likh '+ f":red[{st.session_state.random_element} {st.session_state.gali}]",icon = "ℹ️")
 
 ###########################################################################################
-
+    time.sleep(1)
     prompt = st.text_area(label="Code input",placeholder="Write your code here",height=305, on_change=text_input)
 
     def llm(promt):
@@ -88,11 +103,11 @@ if st.session_state.selected:
             with st.sidebar:
                 f"Total tokens:   {response.usage.total_tokens}"
             result = response.choices[0].message.content
-            st.success(f'Ye le {selected_option} {random.choice (galis)}')
+            st.success(f'Ye le {st.session_state.random_element} {random.choice (galis)}')
             result
             print(result)
     elif st.session_state.text:
         if selected_option is not None: #you can remove this line if not needed
-            st.warning('Pura code likh '+ f":red[{selected_option} {random.choice (galis)}]")
+            st.warning('Pura code likh '+ f":red[{st.session_state.random_element} {random.choice (galis)}]")
 
 
