@@ -9,6 +9,34 @@ import time
 # api_key = st.text_input(':RED[ENTER YOUR API KEY]',placeholder='Insert your api key here')
 # load_dotenv()
 # api_key = os.getenv('OPENAI_API_KEY')
+
+def llm(promt):
+        response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {
+            "role": "system",
+            "content": """You are a code documentation assistant//\n which helps creating the document for the code for developers.// \n//You will create the document in Markdown format.
+            You will provide any suggestion related to improve code with heading 'Suggestions'//"""
+            },
+            {
+            "role": "user",
+            "content": f"""Elaborate all the functions, loops, if/else, variables or anything else that might be important and what is its use which you are using in the code.
+            code: ```{prompt}```"""
+            }
+
+        ],
+
+        temperature=0.8,
+        max_tokens=1000,
+        top_p=1,
+        frequency_penalty=0,
+        presence_penalty=0
+        )
+    
+        return response
+
+
 api_key = os.environ['OPENAI_API_KEY_MINE']
 
 client = OpenAI(api_key = api_key)
@@ -66,48 +94,36 @@ if st.session_state.selected:
 
 ###########################################################################################
     time.sleep(1)
-    prompt = st.text_area(label="Code input, :red[press Ctrl+Enter after writing code]",placeholder="Write your code here",height=305, on_change=text_input)
+    # prompt = st.text_area(label="Code input, :red[press Ctrl+Enter after writing code]",placeholder="Write your code here",height=305, on_change=text_input)
 
-    def llm(promt):
-        response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {
-            "role": "system",
-            "content": """You are a code documentation assistant//\n which helps creating the document for the code for developers.// \n//You will create the document in Markdown format.
-            You will provide any suggestion related to improve code//"""
-            },
-            {
-            "role": "user",
-            "content": f"""Elaborate all the functions, loops, if/else, variables or anything else that might be important and what is its use which you are using in the code.
-            code: ```{prompt}```"""
-            }
+    # form container start
+    form = st.form(key='my_form')
+    # text area in form container
+    prompt = form.text_area(label="Code input, :red[press Ctrl+Enter after writing code]",placeholder="Write your code here",height=305)
+    # Submit button in form container
+    submit_button = form.form_submit_button(label='Submit',on_click=click_button)
 
-        ],
+    if st.session_state.clicked and len(prompt) > 1:
+        # st.button('Submit', on_click=click_button)
+        # Generating response from llm
+        response = llm(prompt)
 
-        temperature=0.8,
-        max_tokens=1000,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
-        )
-    
-        return response
+        # showing the total tokens used in sidebar
+        with st.sidebar:
+            f"Total tokens:   {response.usage.total_tokens}"
+
+        # main result from the llm
+        result = response.choices[0].message.content
+
+        st.success(f'Ye le {st.session_state.random_element} {random.choice (galis)}') #remove it
+
+        #printing the result
+        result
+        print(result)
 
 
-    if st.session_state.text and len(prompt) > 1:
-        st.button('Submit', on_click=click_button)
-        if st.session_state.clicked:
-            response = llm(prompt)
-
-            with st.sidebar:
-                f"Total tokens:   {response.usage.total_tokens}"
-            result = response.choices[0].message.content
-            st.success(f'Ye le {st.session_state.random_element} {random.choice (galis)}')
-            result
-            print(result)
-    elif st.session_state.text:
+    elif st.session_state.clicked:
         if selected_option is not None: #you can remove this line if not needed
-            st.warning('Pura code likh '+ f":red[{st.session_state.random_element} {random.choice (galis)}]")
+            st.warning('Pura code likh '+ f":red[{st.session_state.random_element} {random.choice (galis)}]") #Change this later
 
 
