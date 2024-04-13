@@ -1,8 +1,13 @@
 from openai import OpenAI
 import streamlit as st
 import random, json
+import os
+# from dotenv import load_dotenv
 
-api_key = st.text_input(':RED[ENTER YOUR API KEY]',placeholder='Insert your api key here')
+# api_key = st.text_input(':RED[ENTER YOUR API KEY]',placeholder='Insert your api key here')
+# load_dotenv()
+# api_key = os.getenv('OPENAI_API_KEY')
+api_key = os.environ['OPENAI_API_KEY']
 
 client = OpenAI(api_key = api_key)
 # with open('doc.json') as file:
