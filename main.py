@@ -64,7 +64,7 @@ def llm(promt):
         {
         "role": "system",
         "content": """You are a code documentation assistant//\n which helps creating the document for the code for developers.// \n//You will create the document in Markdown format.
-        You will provide any suggestion related to improve code,// also provide inline comment in the code//"""
+        You will provide any suggestion related to improve code,// You will provide inline comment of the code//"""
         },
         {
         "role": "user",
