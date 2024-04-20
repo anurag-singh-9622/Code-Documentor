@@ -2,12 +2,9 @@ from openai import OpenAI
 import streamlit as st
 import os
 import time
-from markdownify import markdownify as md
+# from markdownify import markdownify as md
 from docx import Document
 from bs4 import BeautifulSoup
-
-
-# from dotenv import load_dotenv
 
 
 if 'api_submit_btn' not in st.session_state:
@@ -19,6 +16,7 @@ def api_submit_btn():
 # Taking the api input in side ba
 with st.sidebar:
     # form container starts from here
+    "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"
     api_form = st.form(key='api_input_form')
     api_form.text_input(':RED[ENTER YOUR API KEY]',key='api_key',placeholder='Insert your api key here', type="password")
     # Submit button in form container
@@ -36,7 +34,7 @@ def llm(promt):
             {
             "role": "system",
             "content": """You are a code documentation assistant//\n which helps creating the document for the code for developers.// \n//You will create the document in Markdown format.
-            You will provide any suggestion related to improve code with heading 'Suggestions'// If you see very absurd code, //don't return anything just return,// ```Please provide correct code```// Return the document in HTML format//"""
+            You will provide any suggestion related to improve code with heading 'Suggestions'// If you see very absurd code, //don't return anything just return,// ```Please provide correct code```//"""
             },
             # {
             # "role": "user",
@@ -96,25 +94,25 @@ prompt = form.text_area(label="Code input",placeholder="Write your code here",he
 
 submit_button = form.form_submit_button(label='Submit',on_click=click_button)
 
-st.cache_resource
+@st.cache_resource
 def cached_result(result):
-    markdown_output = md(result)
+    # markdown_output = md(result)
     # Create a new Word document
-    doc = Document()
+    # doc = Document()
 
-    # Parse the HTML content using BeautifulSoup
-    soup = BeautifulSoup(result, 'html.parser')
+    # # Parse the HTML content using BeautifulSoup
+    # soup = BeautifulSoup(result, 'html.parser')
 
-    # Extract and add text and formatting to the document
-    for tag in soup.find_all(['h1', 'p']):
-        if tag.name == 'h1':
-            doc.add_heading(tag.text, level=1)
-        elif tag.name == 'p':
-            doc.add_paragraph(tag.text)
+    # # Extract and add text and formatting to the document
+    # for tag in soup.find_all(['h1', 'p']):
+    #     if tag.name == 'h1':
+    #         doc.add_heading(tag.text, level=1)
+    #     elif tag.name == 'p':
+    #         doc.add_paragraph(tag.text)
 
     # Save the document in memory (in a variable)
-    docx_output = doc
-    return markdown_output, docx_output
+    # docx_output = doc
+    return result
 
 
 if not st.session_state.download_clicked:
@@ -135,13 +133,12 @@ if not st.session_state.download_clicked:
             st.success("Your Doument is Generated successfully")
 
             #printing the result
-            markdown_output, docx_output = cached_result(result)
+            markdown_output = cached_result(result)
             with st.expander("See the result"):
                 markdown_output
             
-            download_btn_docx = st.download_button(
-                label="Download as word",
-                key= "docx",
+            download_btn = st.download_button(
+                label="Download as md",
                 data=markdown_output,
                 file_name='result.md',
                 mime='text',
