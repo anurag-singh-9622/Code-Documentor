@@ -1,20 +1,39 @@
-# import streamlit as st
-# import random
+from docx import Document
+from bs4 import BeautifulSoup
 
-# names = ['Vaibhav', 'Deepu', 'Shantanu']
-# gali = ['bhenchod', 'bosdiwala', 'madharchod', 'gandu', 'ben ka loda', 'chutia']
-# # Define a format function
-# def format_func(option):
-#     return option
- 
-# # Create the select box with custom formatting
-# selected_option = st.selectbox('Choose an option:', names, format_func=format_func)
- 
-# gali_text = random.choice (gali)
-# # Display the selected option
-# st.write('You selected:', f":red[{selected_option} {gali_text}]")
-import os
-from dotenv import load_dotenv
+# HTML content (replace with your actual HTML)
+html_content = '''
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sample HTML</title>
+    <style>
+        h1 { color: blue; }
+        p { font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>Hello, Markdown!</h1>
+    <p>This is a sample paragraph.</p>
+</body>
+</html>
+'''
 
-load_dotenv()
-print(os.getenv('HELLO'))
+# Create a new Word document
+doc = Document()
+
+# Parse the HTML content using BeautifulSoup
+soup = BeautifulSoup(html_content, 'html.parser')
+
+# Extract and add text and formatting to the document
+for tag in soup.find_all(['h1', 'p']):
+    if tag.name == 'h1':
+        doc.add_heading(tag.text, level=1)
+    elif tag.name == 'p':
+        doc.add_paragraph(tag.text)
+
+# Save the document in memory (in a variable)
+docx_output = doc
+
+# Print the first paragraph (for demonstration purposes)
+print(docx_output.paragraphs[0].text)
