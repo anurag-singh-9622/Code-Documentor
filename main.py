@@ -16,7 +16,7 @@ if 'api_submit_btn' not in st.session_state:
 def api_submit_btn():
     st.session_state.api_submit_btn = True
 
-# Taking the api input in side bar
+# Taking the api input in side ba
 with st.sidebar:
     # form container starts from here
     api_form = st.form(key='api_input_form')
