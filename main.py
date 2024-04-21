@@ -98,6 +98,9 @@ if 'download_clicked' not in st.session_state:
 def click_download_button():
     st.session_state.download_clicked = True
 
+if 'response' not in st.session_state:
+    st.session_state.response = ''
+
 
 # Display the selected option
 time.sleep(3)
@@ -131,42 +134,44 @@ def cached_result(result):
     return result
 
 
-if not st.session_state.download_clicked:
-
-    if st.session_state.api_submit_btn and len(st.session_state.api_key) > 0:
-
-        if st.session_state.clicked and api is not None and len(prompt) > 1:
-            # Generating response from llm
-            response = llm(prompt)
-
-            # showing the total tokens used in sidebar
-            with st.sidebar:
-                f"Total tokens:   {response.usage.total_tokens}"
-
-            # main result from the llm
-            result = response.choices[0].message.content
-
-            st.success("Your Doument is Generated successfully")
-
-            #printing the result
-            markdown_output = cached_result(result)
-            with st.expander("See the result"):
-                markdown_output
-            
-            download_btn = st.download_button(
-                label="Download as md",
-                data=markdown_output,
-                file_name='result.md',
-                mime='text',
-                on_click=click_download_button
-            )
-
-            st.info("If you don't like the result you can submit again to regenerate", icon="ℹ️")
-            print(result)
 
 
-        elif st.session_state.clicked and api is not None:
-            st.warning(":red[Please Write Some Code]") #Change this later
-    elif st.session_state.api_submit_btn:
+if st.session_state.api_submit_btn and len(st.session_state.api_key) > 0:
+
+    if st.session_state.clicked and api is not None and len(prompt) > 1:
+        
+        if not st.session_state.download_clicked:
+        # Generating response from llm
+            st.session_state.response = llm(prompt)
+
+        # showing the total tokens used in sidebar
         with st.sidebar:
-            st.warning(":red[Insert the API KEY]")
+            f"Total tokens:   {st.session_state.response.usage.total_tokens}"
+
+        # main result from the llm
+        result = st.session_state.response.choices[0].message.content
+
+        st.success("Your Doument is Generated successfully")
+
+        #printing the result
+        markdown_output = cached_result(result)
+        with st.expander("See the result"):
+            markdown_output
+        
+        download_btn = st.download_button(
+            label="Download as md",
+            data=markdown_output,
+            file_name='result.md',
+            mime='text',
+            on_click=click_download_button
+        )
+
+        st.info("If you don't like the result you can submit again to regenerate", icon="ℹ️")
+        print(result)
+
+
+    elif st.session_state.clicked and api is not None:
+        st.warning(":red[Please Write Some Code]") #Change this later
+elif st.session_state.api_submit_btn:
+    with st.sidebar:
+        st.warning(":red[Insert the API KEY]")
