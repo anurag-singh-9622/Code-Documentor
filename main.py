@@ -33,8 +33,11 @@ def llm(promt):
         messages=[
             {
             "role": "system",
-            "content": """You are a code documentation assistant//\n which helps creating the document for the code for developers.// \n//You will create the document in Markdown format.
-            You will provide any suggestion related to improve code with heading 'Suggestions'// If you see very absurd code, //don't return anything just return,// ```Please provide correct code```//"""
+            "content": """You are a code documentation assistant//
+              which helps creating the document for the code for developers.// 
+              You will create the document in Markdown format.//
+              You will provide any suggestion related to improve code with heading 'Suggestions'//
+              If you see very absurd code, // just return ```Please provide correct code```//"""
             },
             # {
             # "role": "user",
@@ -42,7 +45,20 @@ def llm(promt):
             # },
             {
             "role": "user",
-            "content": f"""Elaborate all the functions, loops, if/else, variables or anything else that might be important and what is its use which you are using in the code.
+            "content": f"""Explain the code's
+            Imports
+            Variables
+            Functions
+            Function parameters
+            Classes
+            Classes's Attributes
+            Classes's Methods
+            IF/Else
+            While loop
+            For loop
+            Algorithm Used
+            Data structures//
+            If you find any major flaw in the code please give Suggestions at the end.//
             code: ```{prompt}```"""
             }
         ],
