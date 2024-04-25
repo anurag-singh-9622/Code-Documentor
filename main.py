@@ -3,8 +3,8 @@ import streamlit as st
 import os
 import time
 # from markdownify import markdownify as md
-from docx import Document
-from bs4 import BeautifulSoup
+# from docx import Document
+# from bs4 import BeautifulSoup
 
 
 if 'api_submit_btn' not in st.session_state:
