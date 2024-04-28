@@ -49,6 +49,9 @@ class GitHubRepoFetcher:
         """
         self._fetch_contents()
         return self.list_of_contents
+    
+    def get_contents(self):
+        return self.list_of_contents
 
     def display_files(self):
         """

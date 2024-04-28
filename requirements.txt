@@ -1,6 +1,5 @@
 openai
 python-dotenv
 numpy
-markdownify
-python-docx
-BeautifulSoup
+requests
+streamlit
