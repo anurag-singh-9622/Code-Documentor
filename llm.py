@@ -27,10 +27,24 @@ class llm:
                         "If you find very absurd code, return 'Please provide correct code'."
                     )
                 },
-                {
-                    "role": "user",
-                    "content": f"Document the following code snippet: ```{prompt}```"
-                }
+            {
+            "role": "user",
+            "content": f"""Explain the code's
+            Imports
+            Variables
+            Functions
+            Function parameters
+            Classes
+            Classes's Attributes
+            Classes's Methods
+            IF/Else
+            While loop
+            For loop
+            Algorithm Used
+            Data structures//
+            If you find any major flaw in the code please give Suggestions at the end.//
+            code: ```{prompt}```"""
+            }
             ],
             temperature=0.8,
             max_tokens=1000,
@@ -40,8 +54,8 @@ class llm:
         )
 
         # Return the generated documentation from the response
-        return response.choices[0].message["content"]
-
+        return response
+    
 # Example usage
 if __name__ == "__main__":
     # Create an instance of the code documentation assistant with API key and default prompt

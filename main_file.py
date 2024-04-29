@@ -58,6 +58,7 @@ with tab1:
                         with st.expander(f"File: {file_path}"):
                             st.code(content, language="python", line_numbers=True)
                             st.write("-" * 50)  # Separator in Streamlit
+                submitted_to_llm = st.checkbox('Create Documentation')
                         
 
 
@@ -65,11 +66,17 @@ with tab1:
             # Handle errors and display user-friendly messages
             st.error(f"An error occurred while fetching contents: {str(e)}")
 
-with tab2:
-    doc_assistant = llm(api_key=api_key)
-    for file_path, content in list_of_contents.items():
-        if file_path in options:
-            response = doc_assistant.generate_documentation(content)
-            with st.expander(f"File: {file_path}"):
-                response
-                st.write("-" * 50)  # Separator in Streamlit
+        if submitted_to_llm:
+            with tab2:
+                doc_assistant = llm(api_key=api_key)
+                total_tokens = 0
+                for file_path, content in list_of_contents.items():
+                    if file_path in options:
+                        response = doc_assistant.generate_documentation(content)
+                        total_tokens += response.usage.total_tokens
+                        response = response.choices[0].message.content
+                        with st.expander(f"File: {file_path}"):
+                            response
+                            st.write("-" * 50)  # Separator in Streamlit
+                with st.sidebar:
+                    f"total_tokens: {total_tokens}"
