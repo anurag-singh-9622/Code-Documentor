@@ -100,6 +100,8 @@ class GitHubRepoFetcher:
             st.write("-" * 50)  # Separator in Streamlit
             print(content)  # Print to console
             print("##" * 100)  # Console separator
+    
+    
 
 
 class Main:

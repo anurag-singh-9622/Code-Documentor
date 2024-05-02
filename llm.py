@@ -7,16 +7,7 @@ class llm:
     def __init__(self, api_key, prompt=None):
         self.client = OpenAI(api_key=api_key)  # Initialize the OpenAI client with the API key
         self.prompt = prompt  # Store the default prompt
-
-    # Define a method to generate code documentation
-    def generate_documentation(self, custom_prompt=None):
-        # Use the custom prompt if provided, otherwise use the default prompt
-        prompt = custom_prompt if custom_prompt else self.prompt
-
-        # Create a completion using the specified prompt
-        response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
+        self.messages = [
                 {
                     "role": "system",
                     "content": (
@@ -45,7 +36,16 @@ class llm:
             If you find any major flaw in the code please give Suggestions at the end.//
             code: ```{prompt}```"""
             }
-            ],
+            ]
+    # Define a method to generate code documentation
+    def generate_documentation(self, custom_prompt=None):
+        # Use the custom prompt if provided, otherwise use the default prompt
+        prompt = custom_prompt if custom_prompt else self.prompt
+
+        # Create a completion using the specified prompt
+        response = self.client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=self.messages,
             temperature=0.8,
             max_tokens=1000,
             top_p=1,

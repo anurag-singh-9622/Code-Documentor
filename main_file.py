@@ -43,7 +43,7 @@ with tab1:
             if list_all_files:
                 st.header("All Files in Repository")
                 options = st.multiselect(
-                    'Select the files', list_all_files
+                    'Select the files', list_all_files, placeholder="Choose one or more files"
                     )
 
                 # Display the list of all file paths in an expandable section with bullet points
