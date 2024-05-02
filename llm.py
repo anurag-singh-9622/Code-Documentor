@@ -9,43 +9,13 @@ class llm:
         self.prompt = prompt  # Store the default prompt
 
     # Define a method to generate code documentation
-    def generate_documentation(self, custom_prompt=None):
+    def llm_response(self, custom_prompt=None):
         # Use the custom prompt if provided, otherwise use the default prompt
         prompt = custom_prompt if custom_prompt else self.prompt
-
         # Create a completion using the specified prompt
         response = self.client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a code documentation assistant "
-                        "that helps create documentation for code snippets. "
-                        "You will create the document in Markdown format. "
-                        "Provide suggestions for code improvement with a heading 'Suggestions'. "
-                        "If you find very absurd code, return 'Please provide correct code'."
-                    )
-                },
-            {
-            "role": "user",
-            "content": f"""Explain the code's
-            Imports
-            Variables
-            Functions
-            Function parameters
-            Classes
-            Classes's Attributes
-            Classes's Methods
-            IF/Else
-            While loop
-            For loop
-            Algorithm Used
-            Data structures//
-            If you find any major flaw in the code please give Suggestions at the end.//
-            code: ```{prompt}```"""
-            }
-            ],
+            messages=prompt,
             temperature=0.8,
             max_tokens=1000,
             top_p=1,

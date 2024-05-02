@@ -1,7 +1,5 @@
-import streamlit as st
+import prompts
 
-options = st.multiselect(
-    'Select the files',
-    )
+prompt_value = prompts.prompts
 
-st.write('You selected:', options)
+print(prompt_value['code_documentation'])
