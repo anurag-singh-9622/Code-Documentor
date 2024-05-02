@@ -11,7 +11,7 @@ selection = st.selectbox('Select the Use Case', categories, placeholder='Use Cas
 
 
 def code_documentation():
-    tab1, tab2 = st.tabs(["Github repo", "Code Documentation"])
+    tab1, tab2, tab3 = st.tabs(["Github repo", "Code Documentation", "Upload to GitHub"])
     with tab1:
         # Streamlit app title
         st.title("GitHub Repository Code Viewer with Expandable Sections")
@@ -39,7 +39,7 @@ def code_documentation():
                 # Retrieve fetched contents and all file paths
                 list_of_contents = fetcher.get_contents()
                 list_all_files = fetcher.get_all_files()
-
+                dict_file_content = {}
                 if list_of_contents:
                     st.header(f"Contents of Repository: {repo}")
 
@@ -82,17 +82,28 @@ def code_documentation():
                             response = doc_assistant.llm_response(prompts.prompts(selection, content))
                             total_tokens += response.usage.total_tokens
                             response = response.choices[0].message.content
+                            dict_file_content[file_path] = response # Storing the file and corrosponding md response
                             with st.expander(f"File: {file_path}"):
                                 response
                                 st.write("-" * 50)  # Separator in Streamlit
-                    with st.sidebar:
-                        f"total_tokens: {total_tokens}"
+                st.success('File Successfully Generated, got to tab "Code Documentation"',icon="✅")
+                with st.sidebar:
+                    f"total_tokens: {total_tokens}"
+            
+            submitted_to_github = st.checkbox('Upload to GitHub')
+
+            if submitted_to_github:
+                with tab3:
+                    owner = st.text_input("GitHub Username", "anurag-singh-9622")
+                    repo = st.text_input("Repository Name", "code_doc_parody")
+                    token = st.text_input("GitHub Personal Access Token (optional)", type="password", value='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')
+            
 
 def inline_commenting():
     tab1, tab2 = st.tabs(["Github repo", "Inline commenting"])
     with tab1:
         # Streamlit app title
-        st.title("GitHub Repository Code Viewer with Expandable Sections")
+        st.title("GitHub Repository Code  Inline commenting with Expandable Sections")
         # Text inputs for GitHub username, repository name, file extensions, and optional personal access token
         with st.sidebar:
             owner = st.text_input("GitHub Username", "anurag-singh-9622")
@@ -171,7 +182,7 @@ def code_quality():
     tab1, tab2 = st.tabs(["Github repo", "Code Quality"])
     with tab1:
         # Streamlit app title
-        st.title("GitHub Repository Code Viewer with Expandable Sections")
+        st.title("GitHub Repository Code Quality with Expandable Sections")
         # Text inputs for GitHub username, repository name, file extensions, and optional personal access token
         with st.sidebar:
             owner = st.text_input("GitHub Username", "anurag-singh-9622")
