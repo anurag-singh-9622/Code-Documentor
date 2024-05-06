@@ -1,6 +1,7 @@
 import requests
 import base64
 import streamlit as st
+from github import Github
 
 
 class GitHubRepoFetcher:
@@ -99,8 +100,11 @@ class GitHubRepoFetcher:
             st.code(content, language="python", line_numbers=True)
             st.write("-" * 50)  # Separator in Streamlit
             print(content)  # Print to console
-            print("##" * 100)  # Console separator
-    
+            print("##" * 100)  # Console separator\
+
+
+
+
 
 
 class Main:

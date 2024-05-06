@@ -3,3 +3,6 @@ python-dotenv
 numpy
 requests
 streamlit
+PyGithub
+urllib3 
+chardet

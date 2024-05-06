@@ -1,5 +1,6 @@
 import streamlit as st
 from github_repo_fetcher import GitHubRepoFetcher
+from github_repo_pusher import GitHubRepoPusher
 from llm import llm
 import prompts
 
@@ -12,6 +13,8 @@ selection = st.selectbox('Select the Use Case', categories, placeholder='Use Cas
 
 def code_documentation():
     tab1, tab2, tab3 = st.tabs(["Github repo", "Code Documentation", "Upload to GitHub"])
+    st.session_state.submitted_to_github = False
+    st.session_state.response = ''
     with tab1:
         # Streamlit app title
         st.title("GitHub Repository Code Viewer with Expandable Sections")
@@ -72,32 +75,56 @@ def code_documentation():
             except Exception as e:
                 # Handle errors and display user-friendly messages
                 st.error(f"An error occurred while fetching contents: {str(e)}")
-
+            submitted_to_github = False
             if submitted_to_llm:
                 with tab2:
                     doc_assistant = llm(api_key=api_key)
                     total_tokens = 0
                     for file_path, content in list_of_contents.items():
                         if file_path in options:
-                            response = doc_assistant.llm_response(prompts.prompts(selection, content))
-                            total_tokens += response.usage.total_tokens
-                            response = response.choices[0].message.content
+                            if not st.session_state.submitted_to_github:
+                                st.session_state.response = doc_assistant.llm_response(prompts.prompts(selection, content))
+                                total_tokens += st.session_state.response.usage.total_tokens # type: ignore
+                                response = st.session_state.response.choices[0].message.content
+                            # response = f'Hello, my name is {file_path}'
                             dict_file_content[file_path] = response # Storing the file and corrosponding md response
                             with st.expander(f"File: {file_path}"):
-                                response
+                                response # type: ignore
                                 st.write("-" * 50)  # Separator in Streamlit
-                st.success('File Successfully Generated, got to tab "Code Documentation"',icon="✅")
+                    
+                with tab1:
+                    st.success('Document Successfully Generated, go to tab -> Code Documentation',icon="✅")
+                with tab2:
+                    st.info('To upload in github, go to tab -> Upload to Github',icon="ℹ️")
                 with st.sidebar:
-                    f"total_tokens: {total_tokens}"
-            
-            submitted_to_github = st.checkbox('Upload to GitHub')
+                    st.success(f"total_tokens: {total_tokens}",icon="✅")
 
-            if submitted_to_github:
-                with tab3:
-                    owner = st.text_input("GitHub Username", "anurag-singh-9622")
-                    repo = st.text_input("Repository Name", "code_doc_parody")
-                    token = st.text_input("GitHub Personal Access Token (optional)", type="password", value='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')
-            
+            with tab3:
+                owner = st.text_input("GitHub Username", "anurag-singh-9622", key = 'github2_owner_input')
+                repo = st.text_input("Repository Name", "sample", key = 'github2_repo_input')
+                token = st.text_input("GitHub Personal Access Token (optional)", key = 'github2_token_input', type="password", value='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')
+                submitted_to_github = st.checkbox('Upload to GitHub')
+                if submitted_to_github:
+                    st.session_state.submitted_to_github = True
+                    try:
+                        # Create a GitHubRepoPusher instance
+                        pusher = GitHubRepoPusher(owner, repo, token)
+
+                        # Push the files to GitHub
+                        commit_message = "Updating files in bulk files."
+                        results = pusher.push_files(dict_file_content, commit_message)
+
+                        # Display the results
+                        for file_path, result in results.items():
+                            print(f"Result for '{file_path}': {result}")
+                            with st.expander(label = f'{file_path}'): f"Result for '{file_path}': {result}"
+
+                        if results:
+                            st.success('Successfully Pushed to Github',icon="✅")
+                            st.link_button("Go to GitHub", f"https://github.com/{owner}/{repo}")
+                    except Exception as e:
+                        st.error(f"An error occurred while pushing the docs to github: {str(e)}")
+                        print(f"An error occurred while pushing the docs to github: {str(e)}")
 
 def inline_commenting():
     tab1, tab2 = st.tabs(["Github repo", "Inline commenting"])
