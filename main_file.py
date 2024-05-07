@@ -68,7 +68,7 @@ def code_documentation():
                             with st.expander(f"File: {file_path}"):
                                 st.code(content, language="python", line_numbers=True)
                                 st.write("-" * 50)  # Separator in Streamlit
-                    submitted_to_llm = st.checkbox('Create Documentation')
+                    # submitted_to_llm = st.checkbox('Create Documentation')
                             
 
 
@@ -76,7 +76,7 @@ def code_documentation():
                 # Handle errors and display user-friendly messages
                 st.error(f"An error occurred while fetching contents: {str(e)}")
             submitted_to_github = False
-            if submitted_to_llm:
+            if st.checkbox('Create Documentation'):
                 with tab2:
                     doc_assistant = llm(api_key=api_key)
                     total_tokens = 0

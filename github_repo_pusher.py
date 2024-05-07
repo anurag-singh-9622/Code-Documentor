@@ -1,6 +1,5 @@
 from github import Github
-import base64
-
+import os  # For handling file path manipulations
 
 class GitHubRepoPusher:
     """
@@ -23,42 +22,37 @@ class GitHubRepoPusher:
         repo = self.github.get_repo(f"{self.owner}/{self.repo_name}")
         results = {}
 
-        for file_path, content in dict_file_content.items():
-            # encoded_content = base64.b64encode(content.encode()).decode()
-            encoded_content = content
-            # Check if the file exists
-            try:
-                existing_contents = repo.get_contents(file_path, ref="main")
-                if isinstance(existing_contents, list):
-                    # If it's a list, we need to find the exact file
-                    for item in existing_contents:
-                        if item.path == file_path:
-                            existing_file = item
-                            break
-                else:
-                    existing_file = existing_contents
+        for original_file_path, content in dict_file_content.items():
+            # Ensure the file has a .md extension
+            base_name, _ = os.path.splitext(original_file_path)
+            file_path_with_md = f"{base_name}.md"
 
-                # If the file exists, update it
+            # Use the new file path with .md extension
+            encoded_content = content
+
+            try:
+                # Try to get the existing file with the .md extension
+                existing_contents = repo.get_contents(file_path_with_md, ref="main")
+                # If it exists, update it
                 result = repo.update_file(
-                    path=existing_file.path,
+                    path=existing_contents.path,
                     message=commit_message,
                     content=encoded_content,
-                    sha=existing_file.sha,
+                    sha=existing_contents.sha,
                     branch="main",
                 )
-                results[file_path] = f"Updated file '{file_path}'"
-
+                results[file_path_with_md] = f"Updated file '{file_path_with_md}'"
             except:
                 # If it doesn't exist, create it
                 try:
                     result = repo.create_file(
-                        path=file_path,
+                        path=file_path_with_md,
                         message=commit_message,
                         content=encoded_content,
                         branch="main",
                     )
-                    results[file_path] = f"Created file '{file_path}'"
+                    results[file_path_with_md] = f"Created file '{file_path_with_md}'"
                 except Exception as e:
-                    results[file_path] = f"Error creating file '{file_path}': {str(e)}"
+                    results[file_path_with_md] = f"Error creating file '{file_path_with_md}': {str(e)}"
 
         return results

@@ -1,12 +1,8 @@
-import streamlit as st
-st.session_state.submitted_to_github = False
-def submitted_to_github():
-    st.session_state.submitted_to_github = True
+import os
 
-submitted_to_github1 = st.checkbox('Upload to GitHub')
+original_file_path = 'python_gp.py'
 
-# st.session_state.submitted_to_github
-if submitted_to_github1:
-    st.session_state.submitted_to_github = True
-st.session_state.submitted_to_github
-# , key='submitted_to_github', on_change=submitted_to_github
+base_name, _ = os.path.splitext(original_file_path)
+file_path_with_md = f"{base_name}.md"
+print(base_name)
+print(file_path_with_md)
