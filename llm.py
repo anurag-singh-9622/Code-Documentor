@@ -3,7 +3,7 @@ from openai import OpenAI
 # import streamlit as st
 
 # Define a class for the code documentation assistant
-class llm:
+class LLM:
     # Initialize the class with an OpenAI API key and a default prompt
     def __init__(self, api_key, prompt=None):
         self.client = OpenAI(api_key=api_key)  # Initialize the OpenAI client with the API key
