@@ -44,6 +44,7 @@ def fetch_repository_contents(owner, repo, extensions, token):
 
 
 # Function to generate documentation using LLM
+@st.cache_data(show_spinner=True)
 def generate_documentation(list_of_contents, selected_files, api_key, prompt_type):
     """
     Generates documentation for the selected files using a large language model (LLM).
@@ -67,6 +68,24 @@ def generate_documentation(list_of_contents, selected_files, api_key, prompt_typ
         traceback.print_exc()
         return {}, 0
 
+def upload_to_github(owner, repo, token, dict_file_content):
+    try:
+        # Create a GitHubRepoPusher instance
+        pusher = GitHubRepoPusher(owner, repo, token)
+
+        # Push the files to GitHub
+        commit_message = "Updating files in bulk files."
+        results = pusher.push_files(dict_file_content, commit_message)
+
+        # Display the results
+        # for file_path, result in results.items():
+        #     print(f"Result for '{file_path}': {result}")
+        #     with st.expander(label = f'{file_path}'): f"Result for '{file_path}': {result}"
+
+    except Exception as e:
+        st.error(f"An error occurred while pushing the docs to github: {str(e)}")
+        print(f"An error occurred while pushing the docs to github: {str(e)}")
+    return results
 
 # Main Streamlit function
 def code_documentation():
@@ -89,9 +108,14 @@ def code_documentation():
             if list_all_files:
                 selected_files = st.multiselect("Select files", list_all_files)
 
+                for file_path, content in list_of_contents.items():
+                        if file_path in selected_files:
+                            with st.expander(f"File: {file_path}"):
+                                st.code(content, language="python", line_numbers=True)
+
                 # Generate documentation based on selected files
                 if st.checkbox("Generate Documentation"):
-                    prompt_type = selection.lower().replace(" ", "_")  # Use the selected use case
+                    prompt_type = selection.lower().replace(" ", "_")  # type: ignore # Use the selected use case
                     dict_file_content, total_tokens = generate_documentation(list_of_contents, selected_files, api_key, prompt_type)
 
                     # Store in session state for later use
