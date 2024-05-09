@@ -23,6 +23,7 @@ def collect_github_inputs(suffix=''):
     owner = st.text_input(f"GitHub Username {suffix}", DEFAULT_GITHUB_USERNAME, key=f'github_owner_{suffix}')
     repo = st.text_input(f"Repository Name {suffix}", DEFAULT_REPO_NAME, key=f'github_repo_{suffix}')
     token = st.text_input("GitHub Personal Access Token (optional)", key=f'github_token_{suffix}', type="password")
+
     return owner, repo, token
 
 
@@ -68,14 +69,22 @@ def generate_documentation(list_of_contents, selected_files, api_key, prompt_typ
         traceback.print_exc()
         return {}, 0
 
-def upload_to_github(owner, repo, token, dict_file_content):
+def upload_to_github(owner, repo, token, dict_file_content: dict, selection):
     try:
         # Create a GitHubRepoPusher instance
         pusher = GitHubRepoPusher(owner, repo, token)
+        extention = '.md'
+
+        if selection == 'code_documentation':
+            extention = '.md'
+        elif selection == 'inline_commenting':
+            extention = '.py'
+        elif selection == 'code_quality':
+            extention = '.md'
 
         # Push the files to GitHub
         commit_message = "Updating files in bulk files."
-        results = pusher.push_files(dict_file_content, commit_message)
+        results = pusher.push_files(dict_file_content, commit_message, extention=extention)
 
         # Display the results
         # for file_path, result in results.items():
@@ -132,6 +141,7 @@ def code_documentation():
                 with st.expander(f"{file_path}"):
                     st.text(content)
                     st.write("-" * 50)
+        st.info('To upload in github, go to tab -> Upload to Github',icon="ℹ️")
 
     # Tab 3: Inputs for GitHub and upload option
     with tab3:
@@ -140,7 +150,7 @@ def code_documentation():
 
         if 'dict_file_content' in st.session_state and st.session_state.dict_file_content:
             if st.checkbox("Upload to GitHub"):
-                results = upload_to_github(owner, repo, token, st.session_state.dict_file_content)
+                results = upload_to_github(owner, repo, token, st.session_state.dict_file_content, selection=selection)
 
                 if results:
                     st.success("Successfully uploaded to GitHub", icon="✅")
@@ -148,7 +158,7 @@ def code_documentation():
                         with st.expander(f"{file_path}"):
                             st.text(f"Result: {result}")
 
-                st.button("Go to GitHub", on_click=lambda: st.experimental_rerun())  # Refresh to reset states
+                st.link_button("Go to GitHub",f'https://github.com/{owner}/{repo}/')  # Refresh to reset states
 
 
 # Main execution block with error handling

@@ -12,7 +12,7 @@ class GitHubRepoPusher:
         self.token = token
         self.github = Github(token)
 
-    def push_files(self, dict_file_content, commit_message):
+    def push_files(self, dict_file_content, commit_message = 'User Commit new changes', extention='.md'):
         """
         Pushes multiple files to a GitHub repository from a dictionary.
         
@@ -25,7 +25,7 @@ class GitHubRepoPusher:
         for original_file_path, content in dict_file_content.items():
             # Ensure the file has a .md extension
             base_name, _ = os.path.splitext(original_file_path)
-            file_path_with_md = f"{base_name}.md"
+            file_path_with_md = f"{base_name}{extention}"
 
             # Use the new file path with .md extension
             encoded_content = content

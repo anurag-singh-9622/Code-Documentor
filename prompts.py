@@ -34,7 +34,7 @@ def prompts(use_case, content=None):
                     {
                         "role": "system",
                         "content": (
-                            'Add Inline comments to the provided code'
+                            'Add Inline comments to the provided code, Just provide the modified code in python.'
                             f'code: "{content}"'
                         )
                     }
