@@ -57,7 +57,7 @@ def generate_documentation(list_of_contents, selected_files, api_key, prompt_typ
         for file_path, content in list_of_contents.items():
             if file_path in selected_files:
                 response = doc_assistant.llm_response(prompts.prompts(prompt_type, content))
-                total_tokens += response.usage.total_tokens
+                total_tokens += response.usage.total_tokens # type: ignore
                 response_content = response.choices[0].message.content
                 dict_file_content[file_path] = response_content
 

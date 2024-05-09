@@ -6,3 +6,6 @@ streamlit
 PyGithub
 urllib3 
 chardet
+json
+base64
+markdown
