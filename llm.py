@@ -1,5 +1,6 @@
 # Import the necessary modules
 from openai import OpenAI
+import streamlit as st
 # import streamlit as st
 
 # Define a class for the code documentation assistant
@@ -10,11 +11,12 @@ class LLM:
         self.prompt = prompt  # Store the default prompt
 
     # Define a method to generate code documentation
-    def llm_response(self, custom_prompt=None):
+    @st.cache_data(show_spinner=True)
+    def llm_response(_self, custom_prompt=None):
         # Use the custom prompt if provided, otherwise use the default prompt
-        prompt = custom_prompt if custom_prompt else self.prompt
+        prompt = custom_prompt if custom_prompt else _self.prompt
         # Create a completion using the specified prompt
-        response = self.client.chat.completions.create(
+        response = _self.client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=prompt,
             temperature=0.8,

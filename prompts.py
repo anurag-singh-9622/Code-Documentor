@@ -1,5 +1,8 @@
 
 def prompts(use_case, content=None):
+    '''
+    It return a prompt of the use case provided. 
+    '''
     prompts = {"code_documentation": [
                     {
                         "role": "system",
@@ -34,7 +37,7 @@ def prompts(use_case, content=None):
                     {
                         "role": "system",
                         "content": (
-                            'Add Inline comments to the provided code'
+                            'Add Inline comments to the provided code, Just provide the modified code in python.'
                             f'code: "{content}"'
                         )
                     }

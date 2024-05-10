@@ -8,13 +8,65 @@ import traceback
 
 # Constants for default values
 DEFAULT_GITHUB_USERNAME = "anurag-singh-9622"
-DEFAULT_REPO_NAME = "code_doc_parody"
+DEFAULT_REPO_NAME = "sample"
 DEFAULT_EXTENSIONS = ".py, .md"
 
-# Set up the use case selection at the top
-categories = ['code_documentation', 'inline_commenting', 'code_quality']
-selection = st.selectbox('Select the Use Case', categories, placeholder='Choose a Use Case', index=None)
+real_use_case = ['github_repo_code_documentation', 'individual_code_documentation']
+selection_real_use_case = st.selectbox('Select the Use Case', real_use_case, placeholder='Choose a Use Case', index=None)
 
+
+
+def seprate_code_documentation():
+    tab1, tab2 = st.tabs(["Generated Documentation", "Upload to GitHub"])
+    with tab1:
+        st.title("Generate Documentation")
+        code_input = st.text_area('Write or Paste your code here for documentation, inline commenting or code quality', placeholder='Write code here')
+        submited_code = st.checkbox('Submit Code')
+        dict_file_content = {}
+        total_tokens = 0
+        if submited_code:
+            with st.sidebar:
+                categories = ['code_documentation', 'inline_commenting', 'code_quality']
+                task = st.selectbox('Select one or more tasks', categories)
+                api_key = st.text_input("OpenAI API key", type="password")
+                file_name = st.text_input('Write your filename with extention', 'sample.py')
+                submitted = st.checkbox("Generate Documentation")
+                
+            if submitted:
+                llm = LLM(api_key=api_key)
+                response = llm.llm_response(prompts.prompts(task, code_input))
+
+                total_tokens += response.usage.total_tokens # type: ignore
+                response_content = response.choices[0].message.content
+
+                dict_file_content[file_name] = response_content
+                with st.expander(file_name):
+                    response.choices[0].message.content
+                if response:
+                    st.success("Documentation generated, go to tab -> Generated Documentation", icon="✅")
+                    st.sidebar.success(f"Total tokens used: {total_tokens}", icon="✅") # type: ignore
+                    # Store in session state for later use
+                    st.session_state.dict_file_content = dict_file_content
+                    st.info('To upload in github, go to tab -> Upload to Github',icon="ℹ️")
+
+    with tab2:
+        st.header("Upload to GitHub")
+        st.write('Fill this if you want to upload in GitHub')
+        owner, repo, token = collect_github_inputs("Upload")
+
+
+        if 'dict_file_content' in st.session_state and st.session_state.dict_file_content:
+            if st.checkbox("Upload to GitHub"):
+                results = upload_to_github(owner, repo, token, st.session_state.dict_file_content, selection=task)
+                if results:
+                    st.success("Successfully uploaded to GitHub", icon="✅")
+                    for file_path, result in results.items():
+                        with st.expander(f"{file_path}"):
+                            st.text(f"Result: {result}")
+
+                st.link_button("Go to GitHub",f'https://github.com/{owner}/{repo}/')
+
+        
 # Function to collect GitHub input details
 def collect_github_inputs(suffix=''):
     """
@@ -23,8 +75,8 @@ def collect_github_inputs(suffix=''):
     owner = st.text_input(f"GitHub Username {suffix}", DEFAULT_GITHUB_USERNAME, key=f'github_owner_{suffix}')
     repo = st.text_input(f"Repository Name {suffix}", DEFAULT_REPO_NAME, key=f'github_repo_{suffix}')
     token = st.text_input("GitHub Personal Access Token (optional)", key=f'github_token_{suffix}', type="password")
-    return owner, repo, token
 
+    return owner, repo, token
 
 # Function to fetch repository contents
 def fetch_repository_contents(owner, repo, extensions, token):
@@ -42,12 +94,15 @@ def fetch_repository_contents(owner, repo, extensions, token):
         traceback.print_exc()
         return {}, []
 
-
 # Function to generate documentation using LLM
 @st.cache_data(show_spinner=True)
-def generate_documentation(list_of_contents, selected_files, api_key, prompt_type):
+def generate_documentation(list_of_contents, selected_files:list, api_key:str, prompt_type:str):
     """
     Generates documentation for the selected files using a large language model (LLM).
+    :param list_of_contents: A list having file path as key and code as its key
+    :param selected_files: A list of files that user selected
+    :param api_key: LLM api key
+    :param prompt_type: It is the type of prompt, like prompt for code documentatio, or inline commenting or code quality
     """
     try:
         doc_assistant = LLM(api_key=api_key)
@@ -68,14 +123,22 @@ def generate_documentation(list_of_contents, selected_files, api_key, prompt_typ
         traceback.print_exc()
         return {}, 0
 
-def upload_to_github(owner, repo, token, dict_file_content):
+def upload_to_github(owner, repo, token, dict_file_content: dict, selection):
     try:
         # Create a GitHubRepoPusher instance
         pusher = GitHubRepoPusher(owner, repo, token)
+        extention = '.md'
+
+        if selection == 'code_documentation':
+            extention = '.md'
+        elif selection == 'inline_commenting':
+            extention = '.py'
+        elif selection == 'code_quality':
+            extention = '.md'
 
         # Push the files to GitHub
         commit_message = "Updating files in bulk files."
-        results = pusher.push_files(dict_file_content, commit_message)
+        results = pusher.push_files(dict_file_content, commit_message, extention=extention)
 
         # Display the results
         # for file_path, result in results.items():
@@ -132,6 +195,7 @@ def code_documentation():
                 with st.expander(f"{file_path}"):
                     st.text(content)
                     st.write("-" * 50)
+        st.info('To upload in github, go to tab -> Upload to Github',icon="ℹ️")
 
     # Tab 3: Inputs for GitHub and upload option
     with tab3:
@@ -140,7 +204,7 @@ def code_documentation():
 
         if 'dict_file_content' in st.session_state and st.session_state.dict_file_content:
             if st.checkbox("Upload to GitHub"):
-                results = upload_to_github(owner, repo, token, st.session_state.dict_file_content)
+                results = upload_to_github(owner, repo, token, st.session_state.dict_file_content, selection=selection)
 
                 if results:
                     st.success("Successfully uploaded to GitHub", icon="✅")
@@ -148,13 +212,17 @@ def code_documentation():
                         with st.expander(f"{file_path}"):
                             st.text(f"Result: {result}")
 
-                st.button("Go to GitHub", on_click=lambda: st.experimental_rerun())  # Refresh to reset states
-
+                st.link_button("Go to GitHub",f'https://github.com/{owner}/{repo}/')  # Refresh to reset states
 
 # Main execution block with error handling
 try:
-    if selection:
+    if selection_real_use_case == 'github_repo_code_documentation':
+        # Set up the use case selection at the top
+        categories = ['code_documentation', 'inline_commenting', 'code_quality']
+        selection = st.selectbox('Select the task', categories, placeholder='Choose a task', index=None)
         code_documentation()
+    elif selection_real_use_case == 'individual_code_documentation':
+        seprate_code_documentation()
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")
     print(f"An error occurred: {str(e)}")
