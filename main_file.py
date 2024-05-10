@@ -4,6 +4,7 @@ from github_repo_pusher import GitHubRepoPusher
 from llm import LLM
 import prompts
 import traceback
+import os
 
 
 # Constants for default values
@@ -27,10 +28,18 @@ def seprate_code_documentation():
         if submited_code:
             with st.sidebar:
                 categories = ['code_documentation', 'inline_commenting', 'code_quality']
-                task = st.selectbox('Select one or more tasks', categories)
+                task = st.selectbox('Select a task', categories)
                 api_key = st.text_input("OpenAI API key", type="password")
                 file_name = st.text_input('Write your filename with extention', 'sample.py')
                 submitted = st.checkbox("Generate Documentation")
+                base_name, default_ext = os.path.splitext(file_name)
+                
+                if task == 'code_documentation':
+                    extention = '.md'
+                elif task == 'inline_commenting':
+                    extention = default_ext
+                elif task == 'code_quality':
+                    extention = '.md'
                 
             if submitted:
                 llm = LLM(api_key=api_key)
@@ -40,7 +49,7 @@ def seprate_code_documentation():
                 response_content = response.choices[0].message.content
 
                 dict_file_content[file_name] = response_content
-                with st.expander(file_name):
+                with st.expander(f'{base_name}{extention}'):
                     response.choices[0].message.content
                 if response:
                     st.success("Documentation generated, go to tab -> Generated Documentation", icon="✅")
