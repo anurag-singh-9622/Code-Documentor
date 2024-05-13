@@ -1,24 +1,27 @@
 import streamlit as st
 from github_repo_fetcher import GitHubRepoFetcher
 from github_repo_pusher import GitHubRepoPusher
+from push_to_confluence import confluence
 from llm import LLM
 import prompts
 import traceback
 import os
-
+st.set_page_config(page_title = "Code Documentor",page_icon="🧊", layout="wide", initial_sidebar_state="expanded") 
 
 # Constants for default values
 DEFAULT_GITHUB_USERNAME = "anurag-singh-9622"
 DEFAULT_REPO_NAME = "sample"
 DEFAULT_EXTENSIONS = ".py, .md"
 
+
+st.title("Code Documentor")
 real_use_case = ['github_repo_code_documentation', 'individual_code_documentation']
-selection_real_use_case = st.selectbox('Select the Use Case', real_use_case, placeholder='Choose a Use Case', index=None)
+selection_real_use_case = st.selectbox('Select the Use Case', real_use_case, index=None, placeholder="Select the Use Cases here", help="These are the use case that you need")
 
 
 
 def seprate_code_documentation():
-    tab1, tab2 = st.tabs(["Generated Documentation", "Upload to GitHub"])
+    tab1, tab2, tab3 = st.tabs(["Generated Documentation", "Upload to GitHub", "Upload to Confluence"])
     with tab1:
         st.title("Generate Documentation")
         code_input = st.text_area('Write or Paste your code here for documentation, inline commenting or code quality', placeholder='Write code here')
@@ -74,6 +77,20 @@ def seprate_code_documentation():
                             st.text(f"Result: {result}")
 
                 st.link_button("Go to GitHub",f'https://github.com/{owner}/{repo}/')
+
+    with tab3:
+        if selection == "code_documentation":
+            st.header("Upload to Confluence")
+            confluence_url = st.text_input("Confluence URL", placeholder="Add the Confluence URL here")  
+            space_key = st.text_input("Space Key", placeholder="Add the Space key here")  
+            username = st.text_input("User Name", placeholder="Add your username here")   
+            api_token = st.text_input("API Key", placeholder="Add the api token here")
+            
+            if st.checkbox("Upload to Conflunce"):
+                for file_path, content in st.session_state.dict_file_content.items():
+                    confluence(confluence_url,space_key,username,api_token,file_path,content)
+        else:
+            st.info("It is only selectable for code documentation", icon="ℹ️")
 
         
 # Function to collect GitHub input details
@@ -161,7 +178,7 @@ def upload_to_github(owner, repo, token, dict_file_content: dict, selection):
 
 # Main Streamlit function
 def code_documentation():
-    tab1, tab2, tab3 = st.tabs(["GitHub Repo", "Generated Documentation", "Upload to GitHub"])
+    tab1, tab2, tab3, tab4 = st.tabs(["GitHub Repo", "Generated Documentation", "Upload to GitHub", "Upload to Confluence"])
 
     # Tab 1: Fetch repository contents and generate documentation
     with tab1:
@@ -222,15 +239,32 @@ def code_documentation():
                             st.text(f"Result: {result}")
 
                 st.link_button("Go to GitHub",f'https://github.com/{owner}/{repo}/')  # Refresh to reset states
+    
+    with tab4:
+        if selection == "code_documentation":
+            st.header("Upload to Confluence")
+            confluence_url = st.text_input("Confluence URL", placeholder="Add the Confluence URL here")  
+            space_key = st.text_input("Space Key", placeholder="Add the Space key here")  
+            username = st.text_input("User Name", placeholder="Add your username here")   
+            api_token = st.text_input("API Key", placeholder="Add the api token here")
+            
+            if st.checkbox("Upload to Conflunce"):
+                for file_path, content in st.session_state.dict_file_content.items():
+                    confluence(confluence_url,space_key,username,api_token,file_path,content)
+        else:
+            st.info("It is only selectable for code documentation", icon="ℹ️")
+
 
 # Main execution block with error handling
 try:
     if selection_real_use_case == 'github_repo_code_documentation':
         # Set up the use case selection at the top
         categories = ['code_documentation', 'inline_commenting', 'code_quality']
-        selection = st.selectbox('Select the task', categories, placeholder='Choose a task', index=None)
+        selection = st.radio('Select the task', categories, index=None)
         code_documentation()
     elif selection_real_use_case == 'individual_code_documentation':
+        categories = ['code_documentation', 'inline_commenting', 'code_quality']
+        selection = st.radio('Select the task', categories, index=None)
         seprate_code_documentation()
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")

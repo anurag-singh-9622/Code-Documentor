@@ -37,8 +37,12 @@ def prompts(use_case, content=None):
                     {
                         "role": "system",
                         "content": (
-                            'Add Inline comments to the provided code, Just provide the modified code in python.'
-                            f'code: "{content}"'
+                            ''' Write clear and concise inline comments explaining the functionality of the provided Python code.
+                                Target the comments towards a new and experinced programmer.
+                                Focus on explaining the purpose of each code block, the logic behind the variables and functions, and any non-obvious aspects of the code.
+                                Use code comments syntax (e.g. # for single line comments, triple quotes for multi-line comments).
+                                '''
+                            f'code snippet: "{content}"'
                         )
                     }
                     ],
