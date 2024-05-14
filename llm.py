@@ -18,7 +18,7 @@ class LLM:
         # Create a completion using the specified prompt
         response = _self.client.chat.completions.create(
             model="gpt-3.5-turbo",
-            messages=prompt,
+            messages=prompt, # type: ignore
             temperature=0.8,
             max_tokens=1000,
             top_p=1,
