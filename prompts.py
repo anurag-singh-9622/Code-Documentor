@@ -1,56 +1,12 @@
 
-def prompts(use_case, content=None):
+def prompts(task, content=None):
     '''
-    It return a prompt of the use case provided. 
+    It returns a prompt of the use task provided. 
     '''
-    prompts = {"code_documentation": [
-                    {
-                        "role": "system",
-                        "content": (
-                            "You are a code documentation assistant "
-                            "that helps create documentation for code snippets. "
-                            "You will create the document in Markdown format. "
-                            "Provide suggestions for code improvement with a heading 'Suggestions'. "
-                            "If you find very absurd code, return 'Please provide correct code'."
-                        )
-                    },
-                {
-                "role": "user",
-                "content": f"""Explain the code's
-                Imports
-                Variables
-                Functions
-                Function parameters
-                Classes
-                Classes's Attributes
-                Classes's Methods
-                IF/Else
-                While loop
-                For loop
-                Algorithm Used
-                Data structures//
-                If you find any major flaw in the code please give Suggestions at the end.//
-                code: ```{content}```"""
-                }
-                ],
-                'inline_commenting': [
-                    {
-                        "role": "system",
-                        "content": (
-                            ''' Write clear and concise inline comments explaining the functionality of the provided Python code.
-                                Target the comments towards a new and experinced programmer.
-                                Focus on explaining the purpose of each code block, the logic behind the variables and functions, and any non-obvious aspects of the code.
-                                Use code comments syntax (e.g. # for single line comments, triple quotes for multi-line comments).
-                                '''
-                            f'code snippet: "{content}"'
-                        )
-                    }
-                    ],
+    prompts = {"code_documentation": """Create the code documentation for the provided code in Markdown format// for a new commer to understand easily, elaborate every part of the code// start by writing title as code documentation""",
+                "inline_commenting": """generate inline commnets for the following code and put those inline comments back to code // for a new commer to understand easily, elaborate every part of the code // return in the format""",
 
-                "code_quality": [{
-                        "role": "system",
-                        "content": (
-                            '''Generate Code Quality Document for the provided Code.
+                "code_quality": '''Generate Code Quality Document for the provided Code.// for a new commer to understand easily, elaborate every part of the code quality document
                             Please analyze the following Python code and provide a report on its quality.
                             1 Readability and Maintainability:
                             2 Is the code well-formatted and easy to understand?
@@ -70,9 +26,6 @@ def prompts(use_case, content=None):
                             16 Suggestions for improvement in each area.
                             17 An overall rating of the code quality (e.g., good, fair, needs improvement)
                             .'''
-                            f'code: {content}'
-                        )
-                    }]
                 }
-    prompt = prompts[use_case]
+    prompt = prompts[task]
     return prompt
