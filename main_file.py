@@ -139,7 +139,9 @@ def generate_documentation(list_of_contents, selected_files:list, api_key:str, p
         print(f"------------------------------------prompt = {prompt}-----------------------------------------------------")
         for file_path, code in list_of_contents.items():
             if file_path in selected_files:
+                print(f"-------------------------------------------CODE: {code}--------------------------------------------------------")
                 context = context_dict[file_path]
+                print(f"--------------------------------------------CONTEXT: {context}-----------------------------------------")
                 response_content = llm_response(api_key=api_key, prompt=prompt, context = context, code=code)
                 dict_file_content[file_path] = response_content
 
@@ -270,12 +272,12 @@ try:
     if selection_real_use_case == 'github_repo_code_documentation':
         # Set up the use case selection at the top
         categories = ['code_documentation', 'inline_commenting', 'code_quality']
-        selection = st.radio('Select the task', categories)
-        code_documentation()
+        selection = st.radio('Select the task', categories, index=None)
+        if selection: code_documentation()
     elif selection_real_use_case == 'individual_code_documentation':
         categories = ['code_documentation', 'inline_commenting', 'code_quality']
         selection = st.radio('Select the task', categories, index=None)
-        seprate_code_documentation()
+        if selection: seprate_code_documentation()
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")
     print(f"An error occurred: {str(e)}")
