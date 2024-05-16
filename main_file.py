@@ -3,6 +3,7 @@ from github_repo_fetcher import GitHubRepoFetcher
 from github_repo_pusher import GitHubRepoPusher
 from push_to_confluence import confluence
 from llm import LLM
+from rag_llm import llm_response
 import prompts
 import traceback
 import os

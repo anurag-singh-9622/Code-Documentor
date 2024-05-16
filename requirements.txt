@@ -6,6 +6,8 @@ streamlit
 PyGithub
 urllib3 
 chardet
-json
-base64
 markdown
+langchain_openai
+langchain
+langchain_community
+langchain_text_splitters
