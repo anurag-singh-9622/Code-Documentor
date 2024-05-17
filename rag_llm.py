@@ -9,7 +9,9 @@ import os
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains import create_retrieval_chain
+import streamlit as st
 
+@st.cache_data(show_spinner=True)
 def llm_response(api_key,  prompt, code, context = "context not available"):
     
     #------------------------------------------------

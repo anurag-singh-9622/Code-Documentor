@@ -44,10 +44,10 @@ def confluence(confluence_url,space_key,username,api_token,page_title,mark_data)
         st.success(f"{page_title} created successfully!", icon="✅")
         print("Page created successfully!")
     elif response.status_code == 400:
-        st.error(f"{page_title} already exist:")
+        st.info(f"{page_title} already exist:")
         print("Error creating page:", response.text)
     else:
-        st.write("Error creating page:", response.text)
+        st.error(f"Error creating page: {response.text}")
         print("Error creating page:", response.text)
 
 

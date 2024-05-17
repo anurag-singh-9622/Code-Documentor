@@ -28,12 +28,12 @@ def seprate_code_documentation():
         code_input = st.text_area('Write or Paste your code here for documentation, inline commenting or code quality', placeholder='Write code here')
         context = st.text_area("Write the description of the code", placeholder="Write the elaborated description of the code, with detailed descirption of every part of the code.")
         submited_code = st.checkbox('Submit Code')
-        dict_file_content = {}
-        total_tokens = 0
+        dict_file_content_individual = {}
+        # total_tokens = 0
         if submited_code:
             with st.sidebar:
-                categories = ['code_documentation', 'inline_commenting', 'code_quality']
-                task = st.selectbox('Select a task', categories)
+                # categories = ['code_documentation', 'inline_commenting', 'code_quality']
+                # task = st.selectbox('Select a task', categories)
                 api_key = st.text_input("OpenAI API key", type="password")
                 file_name = st.text_input('Write your filename with extention', 'sample.py')
                 submitted = st.checkbox("Generate Documentation")
@@ -48,19 +48,23 @@ def seprate_code_documentation():
                 
             if submitted:
                 # llm = LLM(api_key=api_key)
-                response = llm_response(api_key=api_key, prompt=prompts(task, code_input), context=context, code=code_input)
+                prompt = prompts(task)
+                print(f"-----------------------------------------------Prompt = {prompt}--------------------------------------")
+                response = llm_response(api_key=api_key, prompt=prompt, context=context, code=code_input)
 
-                total_tokens += response.usage.total_tokens # type: ignore
-                response_content = response.choices[0].message.content
-
-                dict_file_content[file_name] = response_content
+                # total_tokens += response.usage.total_tokens # type: ignore
+                response_content = response
+                print("-----------------------------------------------START OF SEPERATE CODE DOCUMENTATION--------------------------------------")
+                print(f"-----------------------------------------------response = {response_content}--------------------------------------")
+                dict_file_content_individual[file_name] = response_content
+                print(f"-----------------------------------------------dict_file_content_individual = {dict_file_content_individual}--------------------------------------")
                 with st.expander(f'{base_name}{extention}'):
-                    response.choices[0].message.content
+                    response_content
                 if response:
-                    st.success("Documentation generated, go to tab -> Generated Documentation", icon="✅")
-                    st.sidebar.success(f"Total tokens used: {total_tokens}", icon="✅") # type: ignore
+                    st.success("Documentation generated", icon="✅")
+                    # st.sidebar.success(f"Total tokens used: {total_tokens}", icon="✅") # type: ignore
                     # Store in session state for later use
-                    st.session_state.dict_file_content = dict_file_content
+                    st.session_state.dict_file_content_individual = dict_file_content_individual
                     st.info('To upload in github, go to tab -> Upload to Github',icon="ℹ️")
 
     with tab2:
@@ -69,9 +73,9 @@ def seprate_code_documentation():
         owner, repo, token = collect_github_inputs("Upload")
 
 
-        if 'dict_file_content' in st.session_state and st.session_state.dict_file_content:
+        if 'dict_file_content_individual' in st.session_state and st.session_state.dict_file_content_individual:
             if st.checkbox("Upload to GitHub"):
-                results = upload_to_github(owner, repo, token, st.session_state.dict_file_content, selection=task)
+                results = upload_to_github(owner, repo, token, st.session_state.dict_file_content_individual, selection=task)
                 if results:
                     st.success("Successfully uploaded to GitHub", icon="✅")
                     for file_path, result in results.items():
@@ -81,7 +85,7 @@ def seprate_code_documentation():
                 st.link_button("Go to GitHub",f'https://github.com/{owner}/{repo}/')
 
     with tab3:
-        if selection == "code_documentation":
+        if task == "code_documentation" or task == "inline_commenting" or task == "code_quality":
             st.header("Upload to Confluence")
             confluence_url = st.text_input("Confluence URL", placeholder="Add the Confluence URL here")  
             space_key = st.text_input("Space Key", placeholder="Add the Space key here")  
@@ -89,10 +93,10 @@ def seprate_code_documentation():
             api_token = st.text_input("API Key", placeholder="Add the api token here")
             
             if st.checkbox("Upload to Conflunce"):
-                for file_path, content in st.session_state.dict_file_content.items():
+                for file_path, content in st.session_state.dict_file_content_individual.items():
                     confluence(confluence_url,space_key,username,api_token,file_path,content)
         else:
-            st.info("It is only selectable for code documentation", icon="ℹ️")
+            st.warning("Error in selecting the correct option", icon="⚠️")
 
         
 # Function to collect GitHub input details
@@ -102,7 +106,7 @@ def collect_github_inputs(suffix=''):
     """
     owner = st.text_input(f"GitHub Username {suffix}", DEFAULT_GITHUB_USERNAME, key=f'github_owner_{suffix}')
     repo = st.text_input(f"Repository Name {suffix}", DEFAULT_REPO_NAME, key=f'github_repo_{suffix}')
-    token = st.text_input("GitHub Personal Access Token (optional)", key=f'github_token_{suffix}', type="password")
+    token = st.text_input("GitHub Personal Access Token", key=f'github_token_{suffix}', type="password")
 
     return owner, repo, token
 
@@ -166,7 +170,7 @@ def upload_to_github(owner, repo, token, dict_file_content: dict, selection):
             extention = '.md'
 
         # Push the files to GitHub
-        commit_message = "Updating files in bulk files."
+        commit_message = "Updating files in bulk."
         results = pusher.push_files(dict_file_content, commit_message, extention=extention)
 
         # Display the results
@@ -276,8 +280,8 @@ try:
         if selection: code_documentation()
     elif selection_real_use_case == 'individual_code_documentation':
         categories = ['code_documentation', 'inline_commenting', 'code_quality']
-        selection = st.radio('Select the task', categories, index=None)
-        if selection: seprate_code_documentation()
+        task = st.radio('Select the task', categories, index=None)
+        if task: seprate_code_documentation()
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")
     print(f"An error occurred: {str(e)}")
