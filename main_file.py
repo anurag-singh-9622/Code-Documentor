@@ -17,7 +17,9 @@ DEFAULT_EXTENSIONS = ".py, .md"
 
 st.title("Code Documentor")
 real_use_case = ['github_repo_code_documentation', 'individual_code_documentation']
-selection_real_use_case = st.selectbox('Select the Use Case', real_use_case, index=None, placeholder="Select the Use Cases here", help="These are the use case that you need")
+
+# selection_real_use_case = st.selectbox("select", real_use_case, format_func=lambda a : (a[0].upper() + a[1:]).replace("_", " "), index=None)
+selection_real_use_case = st.selectbox('Select the Use Case', real_use_case, index=None, placeholder="Select the Use Cases here", help="These are the use cases", format_func=lambda a : (a[0].upper() + a[1:]).replace("_", " "))
 
 
 
