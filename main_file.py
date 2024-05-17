@@ -278,11 +278,11 @@ try:
     if selection_real_use_case == 'github_repo_code_documentation':
         # Set up the use case selection at the top
         categories = ['code_documentation', 'inline_commenting', 'code_quality']
-        selection = st.radio('Select the task', categories, index=None)
+        selection = st.radio('Select the task', categories, index = None, format_func = lambda a : (a[0].upper() + a[1:]).replace("_", " "))
         if selection: code_documentation()
     elif selection_real_use_case == 'individual_code_documentation':
         categories = ['code_documentation', 'inline_commenting', 'code_quality']
-        task = st.radio('Select the task', categories, index=None)
+        task = st.radio('Select the task', categories, index = None, format_func = lambda a : (a[0].upper() + a[1:]).replace("_", " "))
         if task: seprate_code_documentation()
 except Exception as e:
     st.error(f"An error occurred: {str(e)}")
