@@ -264,7 +264,7 @@ def code_documentation():
             confluence_url = st.text_input("Confluence URL", placeholder="Add the Confluence URL here")  
             space_key = st.text_input("Space Key", placeholder="Add the Space key here")  
             username = st.text_input("User Name", placeholder="Add your username here")   
-            api_token = st.text_input("API Key", placeholder="Add the api token here")
+            api_token = st.text_input("API Key", placeholder="Add the api token here", type='password')
             
             if st.checkbox("Upload to Conflunce"):
                 for file_path, content in st.session_state.dict_file_content.items():
